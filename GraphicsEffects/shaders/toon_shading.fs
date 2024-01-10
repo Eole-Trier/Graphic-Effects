@@ -50,6 +50,7 @@ struct SpotLight
 };
 
 uniform bool IsTooned;
+uniform bool IsGooched;
 uniform int toon_color_levels;
 float toon_scale_factor = 1.0f / toon_color_levels;
 
@@ -66,6 +67,7 @@ uniform SpotLight spotLights[10];
 vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec4 GoochShading(vec4 color, vec3 dir, vec3 normal, vec3 viewDir);
 
 void main()
 {
@@ -109,6 +111,8 @@ vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec4 specular = light.specular * spec;
 
     // Combine
+    if (IsGooched)
+        return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
     return ambient + diffuse + specular;
 }
 
@@ -120,7 +124,8 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
 
-    diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
+    if (IsTooned)
+        diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -145,6 +150,8 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
     specular *= attenuation;
 
     // Combine
+    if (IsGooched)
+        return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
     return ambient + diffuse + specular;
 }
 
@@ -155,6 +162,9 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
+
+    if (IsTooned)
+        diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -184,5 +194,32 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation * intensity;
 
     // Combine
+    if (IsGooched)
+        return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
     return ambient + diffuse + specular;
+}
+
+vec4 GoochShading(vec4 color, vec3 dir, vec3 normal, vec3 viewDir)
+{
+    //diffuse
+    float kd = 1;
+    float a = 0.2;
+    float b = 0.6;
+
+    float NL = dot(normalize(normal), normalize(dir));
+    
+    float it = ((1 + NL) / 2);
+    vec3 newColor = (1-it) * (vec3(0, 0, 0.4) + a*color.xyz) 
+               +  it * (vec3(0.4, 0.4, 0) + b*color.xyz);
+    
+    //Highlights
+    vec3 R = reflect( -normalize(dir), 
+                      normalize(normal) );
+    float ER = clamp( dot( normalize(dir), 
+                           normalize(R)),
+                     0, 1);
+    
+    vec4 spec = vec4(1) * pow(ER, 32);
+
+    return vec4(newColor+spec.xyz, color.a);
 }

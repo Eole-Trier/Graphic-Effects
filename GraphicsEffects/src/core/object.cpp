@@ -1,5 +1,6 @@
 #include "core/object.hpp"
 #include "renderer/camera.hpp"
+#include <glad/glad.h>
 
 std::vector<Object*> Object::m_Objects;
 
@@ -104,12 +105,23 @@ void Object::Render()
 	Matrix4x4::Multiply(cam->GetProjView(), model, mvp);
 
 	m_Texture->Use();
-
 	m_Shader->Use();
+
 	m_Shader->SetUniform("mvp", mvp);
 	m_Shader->SetUniform("model", model);
 	cam->SendToShader(*m_Shader);
+
 	m_Shader->Use();
+
+	glDepthFunc(GL_LEQUAL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glLineWidth(4);
+
+	m_Model->Render();
+        
+	glDepthFunc(GL_LESS);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	m_Model->Render();
 
 	OnPostRender();

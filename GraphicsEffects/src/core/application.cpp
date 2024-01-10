@@ -213,7 +213,7 @@ void Application::MainLoop()
     Texture* const tex = new Texture("assets/textures/viking_room.jpg");
     tex->Load();
 
-    Model* const model = new Model("assets/models/viking_room.obj");
+    Model* const model = new Model("assets/models/sphere.obj");
     model->Load();
 
     Shader* const shader = new Shader("modelShader");
@@ -225,7 +225,7 @@ void Application::MainLoop()
 
     Object lightObj(nullptr, nullptr, nullptr, Vector3(0.f, 2.f, 0.f), Vector3(0.f), Vector3(1.f));
     lightObj.AddComponent(new PointLight(&lightObj,
-        Vector4(1.0f), Vector4(0.0f), Vector4(0.0f)));
+        Vector4(1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f)));
 
     Camera camera(M_PI / 2.f, Vector2(800, 600), 0.1f, 100.f, Vector3(0.f, 0.f, 2.f), Vector3(0.f, 0.f, 0.f));
 
@@ -239,6 +239,7 @@ void Application::MainLoop()
     float time = 0.f;
 
     bool isTooned = false;
+    bool isGooched = false;
     int toonColorLevel = 1;
     while (!glfwWindowShouldClose(m_Window))
     {
@@ -251,14 +252,15 @@ void Application::MainLoop()
 
         time += m_DeltaTime;
         ImGui::Checkbox("Tooned", &isTooned);
+        ImGui::Checkbox("Gooched", &isGooched);
         shader->Use();
         if (isTooned)
         {
             ImGui::SliderInt("toon color level", &toonColorLevel, 1, 100);
             shader->SetUniform("toon_color_levels", toonColorLevel);
         }
-        printf("%d\n", isTooned);
         shader->SetUniform("IsTooned", isTooned);
+        shader->SetUniform("IsGooched", isGooched);
         camera.Update();
 
         scene.Update();
