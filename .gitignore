@@ -400,6 +400,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-!GraphicsEffects/source/src/core/debug
-!GraphicsEffects/source/include/core/debug
+!GraphicsEffects/src/core/debug
+!GraphicsEffects/include/core/debug
 !GraphicsEffects/assets/models/*.obj
