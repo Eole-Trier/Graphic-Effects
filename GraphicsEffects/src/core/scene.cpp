@@ -16,7 +16,7 @@ Scene* Scene::CurrentScene()
 }
 
 Scene::Scene(const std::string& name)
-	: m_Root(nullptr, nullptr, nullptr), m_Name(name)
+	: m_Root(nullptr, nullptr, nullptr, Vector4(0.f)), m_Name(name)
 {
 	if (m_CurrentScene == nullptr)
 		m_CurrentScene = this;

@@ -146,12 +146,14 @@
     <ClCompile Include="externals\src\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="externals\src\StbImage\stb_image.cpp" />
     <ClCompile Include="src\core\component.cpp" />
+    <ClCompile Include="src\core\engine_ui.cpp" />
     <ClCompile Include="src\core\object.cpp" />
     <ClCompile Include="src\core\scene.cpp" />
     <ClCompile Include="src\core\transform.cpp" />
     <ClCompile Include="src\renderer\directional_light.cpp" />
     <ClCompile Include="src\renderer\g_buffer.cpp" />
     <ClInclude Include="include\core\component.hpp" />
+    <ClInclude Include="include\core\engine_ui.hpp" />
     <ClInclude Include="include\core\object.hpp" />
     <ClInclude Include="include\core\scene.hpp" />
     <ClInclude Include="include\core\transform.hpp" />

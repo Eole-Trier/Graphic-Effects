@@ -61,9 +61,13 @@ public:
 #pragma endregion
 
 private:
+	static Shader* m_OutlineShader;
+
 	Shader* m_Shader;
 	Model* m_Model;
 	Texture* m_Texture;
+
+	Vector4 m_OutlineColor;
 
 	bool m_Enabled;
 	bool m_Hidden;
@@ -73,10 +77,13 @@ private:
 public:
 	Transform Transformation;
 	std::string Name;
+	bool Outlined;
 
-	Object(Shader* const shader, Model* const model, Texture* const texture);
-	Object(Shader* const shader, Model* const model, Texture* const texture,
+	Object(Shader* const shader, Model* const model, Texture* const texture, const Vector4 outlineColor);
+	Object(Shader* const shader, Model* const model, Texture* const texture, const Vector4 outlineColor, 
 		const Vector3& position, const Vector3& rotation, const Vector3& scaling);
+
+	
 
 	~Object();
 

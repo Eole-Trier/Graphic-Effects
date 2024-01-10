@@ -19,7 +19,7 @@
 #include "core/debug/console_logger.hpp"
 #include "core/debug/fatal_logger.hpp"
 
-// #include "ui/engine_ui.hpp"
+#include "core/engine_ui.hpp"
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_glfw.h"
@@ -133,7 +133,7 @@ void Application::SetupImgui()
 
 void Application::PreLoop()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -197,6 +197,7 @@ void Application::Init()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+
     glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
         {
             std::string msg = "OpenGL error : ";
@@ -213,17 +214,17 @@ void Application::MainLoop()
     Texture* const tex = new Texture("assets/textures/viking_room.jpg");
     tex->Load();
 
-    Model* const model = new Model("assets/models/sphere.obj");
+    Model* const model = new Model("assets/models/viking_room.obj");
     model->Load();
 
-    Shader* const shader = new Shader("modelShader");
+    Shader* const shader = new Shader("toonShader");
     shader->Load("shaders/toon_shading.vs", "shaders/toon_shading.fs");
 
-    Object vikingRoom(shader, model, tex, Vector3(0.f), Vector3(-M_PI / 2, -M_PI / 2, 0), Vector3(1.f));
-    vikingRoom.Name = "Viking room";
+    Object vikingRoom(shader, model, tex, Vector4(1.f, 1.f, 1.f, 1.0f), Vector3(0.f), Vector3(-M_PI / 2, -M_PI / 2, 0), Vector3(1.f));
+    vikingRoom.Name = "Viking sphere";
     scene.AddObject(vikingRoom);
 
-    Object lightObj(nullptr, nullptr, nullptr, Vector3(0.f, 2.f, 0.f), Vector3(0.f), Vector3(1.f));
+    Object lightObj(nullptr, nullptr, nullptr, Vector4(0), Vector3(0.f, 2.f, 0.f), Vector3(0.f), Vector3(1.f));
     lightObj.AddComponent(new PointLight(&lightObj,
         Vector4(1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f)));
 
@@ -264,6 +265,8 @@ void Application::MainLoop()
         camera.Update();
 
         scene.Update();
+
+        EngineUi::DrawSceneGraph(scene);
 
         PostLoop();
     }

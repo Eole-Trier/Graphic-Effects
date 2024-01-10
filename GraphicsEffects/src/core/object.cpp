@@ -3,22 +3,30 @@
 #include <glad/glad.h>
 
 std::vector<Object*> Object::m_Objects;
+Shader* Object::m_OutlineShader;
 
-Object::Object(Shader* const shader, Model* const model, Texture* const texture)
-	: m_Shader(shader), m_Model(model), m_Texture(texture), Transformation(*this)
+
+Object::Object(Shader* const shader, Model* const model, Texture* const texture, const Vector4 outlineColor)
+	: m_Shader(shader), m_Model(model), m_Texture(texture), Transformation(*this), m_OutlineColor(outlineColor)
 {
 	if (shader == nullptr || model == nullptr || texture == nullptr)
 		m_Hidden = true;
 	else
 		m_Hidden = false;
 
+	if (m_OutlineShader == nullptr)
+	{
+		m_OutlineShader = new Shader("outlineShader");
+		m_OutlineShader->Load("shaders/outline.vs", "shaders/outline.fs");
+	}
+
 	m_Objects.push_back(this);
 	OnCreation();
 }
 
-Object::Object(Shader* const shader, Model* const model, Texture* const texture,
+Object::Object(Shader* const shader, Model* const model, Texture* const texture, const Vector4 outlineColor,
 	const Vector3& position, const Vector3& rotation, const Vector3& scaling)
-	: m_Shader(shader), m_Model(model), m_Texture(texture), Transformation(*this, position, rotation, scaling)
+	: m_Shader(shader), m_Model(model), m_Texture(texture), m_OutlineColor(outlineColor), Transformation(*this, position, rotation, scaling)
 {
 	if (shader == nullptr || model == nullptr || texture == nullptr)
 		m_Hidden = true;
@@ -59,7 +67,6 @@ void Object::AddChildren(Object* const child)
 {
 	Transformation.AddChildren(&child->Transformation);
 }
-
 
 void Object::SetEnabled(bool value)
 {
@@ -112,17 +119,38 @@ void Object::Render()
 	cam->SendToShader(*m_Shader);
 
 	m_Shader->Use();
-
-	glDepthFunc(GL_LEQUAL);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	glLineWidth(4);
-
+	
+	if (Outlined)
+	{
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+	}
+	
 	m_Model->Render();
-        
-	glDepthFunc(GL_LESS);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_Model->Render();
+
+	if (Outlined)
+	{
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDisable(GL_DEPTH_TEST);
+
+		m_OutlineShader->Use();
+		m_OutlineShader->SetUniform("Color", m_OutlineColor);
+		Vector3 scale = Transformation.Scaling;
+		Transformation.Scaling *= 1.1f;
+		Transformation.UpdateTransformation();
+		const Matrix4x4& model = Transformation.GetGlobalTransform();
+		Matrix4x4::Multiply(cam->GetProjView(), model, mvp);
+		m_OutlineShader->SetUniform("mvp", mvp);
+		m_Model->Render();
+		Transformation.Scaling = scale;
+
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glEnable(GL_DEPTH_TEST);
+	}
 
 	OnPostRender();
 }
