@@ -1,5 +1,7 @@
 #version 330 core
 
+
+
 out vec4 outColor;
   
 in vec2 texCoords;
@@ -47,6 +49,10 @@ struct SpotLight
     float quadratic; 
 };
 
+uniform bool IsTooned;
+uniform int toon_color_levels;
+float toon_scale_factor = 1.0f / toon_color_levels;
+
 uniform vec3 viewPos;
 
 uniform int nbrDirLights;
@@ -88,7 +94,8 @@ vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
 
-    diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
+    if (IsTooned)
+        diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -112,6 +119,8 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
 
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
+
+    diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);

@@ -217,15 +217,15 @@ void Application::MainLoop()
     model->Load();
 
     Shader* const shader = new Shader("modelShader");
-    shader->Load("shaders/default.vert", "shaders/default.frag");
+    shader->Load("shaders/toon_shading.vs", "shaders/toon_shading.fs");
 
     Object vikingRoom(shader, model, tex, Vector3(0.f), Vector3(-M_PI / 2, -M_PI / 2, 0), Vector3(1.f));
     vikingRoom.Name = "Viking room";
     scene.AddObject(vikingRoom);
 
-    Object lightObj(nullptr, nullptr, nullptr, Vector3(0.f, 5.f, 5.f), Vector3(0.f), Vector3(1.f));
-    lightObj.AddComponent(new DirectionalLight(&lightObj, Vector3(0.f, 1.f, 0.f),
-        Vector4(1.0f), Vector4(1.0f), Vector4(1.0f)));
+    Object lightObj(nullptr, nullptr, nullptr, Vector3(0.f, 2.f, 0.f), Vector3(0.f), Vector3(1.f));
+    lightObj.AddComponent(new PointLight(&lightObj,
+        Vector4(1.0f), Vector4(0.0f), Vector4(0.0f)));
 
     Camera camera(M_PI / 2.f, Vector2(800, 600), 0.1f, 100.f, Vector3(0.f, 0.f, 2.f), Vector3(0.f, 0.f, 0.f));
 
@@ -238,6 +238,8 @@ void Application::MainLoop()
     float lastFrame = 0.f;
     float time = 0.f;
 
+    bool isTooned = false;
+    int toonColorLevel = 1;
     while (!glfwWindowShouldClose(m_Window))
     {
         const float currentFrame = static_cast<float>(glfwGetTime());
@@ -248,7 +250,15 @@ void Application::MainLoop()
         ProcessInput();
 
         time += m_DeltaTime;
-
+        ImGui::Checkbox("Tooned", &isTooned);
+        shader->Use();
+        if (isTooned)
+        {
+            ImGui::SliderInt("toon color level", &toonColorLevel, 1, 100);
+            shader->SetUniform("toon_color_levels", toonColorLevel);
+        }
+        printf("%d\n", isTooned);
+        shader->SetUniform("IsTooned", isTooned);
         camera.Update();
 
         scene.Update();
