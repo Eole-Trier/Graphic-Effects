@@ -106,6 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\externals\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,6 +125,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\externals\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,7 +145,17 @@
     <ClCompile Include="externals\src\ImGui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="externals\src\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="externals\src\StbImage\stb_image.cpp" />
+    <ClCompile Include="src\core\component.cpp" />
+    <ClCompile Include="src\core\object.cpp" />
+    <ClCompile Include="src\core\scene.cpp" />
+    <ClCompile Include="src\core\transform.cpp" />
+    <ClCompile Include="src\renderer\directional_light.cpp" />
     <ClCompile Include="src\renderer\g_buffer.cpp" />
+    <ClInclude Include="include\core\component.hpp" />
+    <ClInclude Include="include\core\object.hpp" />
+    <ClInclude Include="include\core\scene.hpp" />
+    <ClInclude Include="include\core\transform.hpp" />
+    <ClInclude Include="include\renderer\directional_light.hpp" />
     <ClInclude Include="include\renderer\g_buffer.hpp" />
     <ClCompile Include="src\core\application.cpp" />
     <ClCompile Include="src\core\debug\assert.cpp" />
@@ -161,7 +173,10 @@
     <ClCompile Include="src\core\maths\vectorM.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\renderer\camera.cpp" />
+    <ClCompile Include="src\renderer\light.cpp" />
+    <ClCompile Include="src\renderer\point_light.cpp" />
     <ClCompile Include="src\renderer\render_target.cpp" />
+    <ClCompile Include="src\renderer\spot_light.cpp" />
     <ClCompile Include="src\resources\model.cpp" />
     <ClCompile Include="src\resources\resource_manager.cpp" />
     <ClCompile Include="src\resources\shader.cpp" />
@@ -201,7 +216,10 @@
     <ClInclude Include="include\core\maths\vector4.h" />
     <ClInclude Include="include\core\maths\vectorM.h" />
     <ClInclude Include="include\renderer\camera.hpp" />
+    <ClInclude Include="include\renderer\light.hpp" />
+    <ClInclude Include="include\renderer\point_light.hpp" />
     <ClInclude Include="include\renderer\render_target.hpp" />
+    <ClInclude Include="include\renderer\spot_light.hpp" />
     <ClInclude Include="include\renderer\vertex.hpp" />
     <ClInclude Include="include\resources\model.hpp" />
     <ClInclude Include="include\resources\resource.hpp" />

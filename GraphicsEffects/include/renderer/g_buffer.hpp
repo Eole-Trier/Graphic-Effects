@@ -8,8 +8,13 @@ class GBuffer
 {
 public:
 	GBuffer();
+	~GBuffer();
 
 	void AddTarget(RenderTarget target);
+	void FinishInit();
+
+	void Begin();
+	void End();
 
 private:
 	GLuint m_Fbo;

@@ -3,8 +3,15 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "resources/model.hpp"
+#include "resources/shader.hpp"
+#include "resources/texture.hpp"
+
 #include "renderer/camera.hpp"
 #include "renderer/g_buffer.hpp"
+
+#include "core/object.hpp"
+#include "core/scene.hpp"
 
 #include "core/debug/assert.hpp"
 #include "core/debug/log.hpp"
@@ -189,16 +196,44 @@ void Application::Init()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+        {
+            std::string msg = "OpenGL error : ";
+
+            msg.append((char*)glGetString(source)).append((char*)glGetString(type)).append(message);
+
+            Log::LogError(msg);
+        }, nullptr);
 }
 
 void Application::MainLoop()
 {
-    Camera camera(M_PI / 2.f, Vector2(800, 600), 0.1f, 100.f, Vector3(0.f, 0.f, 2.f), Vector3(0.f, 0.f, 0.f));
-    GBuffer gBuffer;
+    Scene scene("Test scene");
+    Texture* const tex = new Texture("assets/textures/viking_room.jpg");
+    tex->Load();
 
-    gBuffer.AddTarget(RenderTarget(false, Vector4(0.f), GL_RGBA16F, GL_RGBA, GL_FLOAT));
-    gBuffer.AddTarget(RenderTarget(false, Vector4(0.f), GL_RGBA16F, GL_RGBA, GL_FLOAT));
-    gBuffer.AddTarget(RenderTarget(false, Vector4(0.f), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE));
+    Model* const model = new Model("assets/models/viking_room.obj");
+    model->Load();
+
+    Shader* const shader = new Shader("modelShader");
+    shader->Load("shaders/default.vert", "shaders/default.frag");
+
+    Object vikingRoom(shader, model, tex, Vector3(0.f), Vector3(-M_PI / 2, -M_PI / 2, 0), Vector3(1.f));
+    vikingRoom.Name = "Viking room";
+    scene.AddObject(vikingRoom);
+
+    Object lightObj(nullptr, nullptr, nullptr, Vector3(0.f, 5.f, 5.f), Vector3(0.f), Vector3(1.f));
+    lightObj.AddComponent(new DirectionalLight(&lightObj, Vector3(0.f, 1.f, 0.f),
+        Vector4(1.0f), Vector4(1.0f), Vector4(1.0f)));
+
+    Camera camera(M_PI / 2.f, Vector2(800, 600), 0.1f, 100.f, Vector3(0.f, 0.f, 2.f), Vector3(0.f, 0.f, 0.f));
+
+    GBuffer gBuffer;
+    gBuffer.AddTarget(RenderTarget("Position pass", false, Vector4(0.f), GL_RGBA16F, GL_RGBA, GL_FLOAT));
+    gBuffer.AddTarget(RenderTarget("Normal pass", false, Vector4(0.f), GL_RGBA16F, GL_RGBA, GL_FLOAT));
+    gBuffer.AddTarget(RenderTarget("Specular pass", false, Vector4(0.f), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE));
+    gBuffer.FinishInit();
 
     float lastFrame = 0.f;
     float time = 0.f;
@@ -213,6 +248,10 @@ void Application::MainLoop()
         ProcessInput();
 
         time += m_DeltaTime;
+
+        camera.Update();
+
+        scene.Update();
 
         PostLoop();
     }
