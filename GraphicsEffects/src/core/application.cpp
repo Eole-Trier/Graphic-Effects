@@ -217,10 +217,13 @@ void Application::MainLoop()
     Model* const model = new Model("assets/models/viking_room.obj");
     model->Load();
 
-    Shader* const shader = new Shader("toonShader");
-    shader->Load("shaders/toon_shading.vs", "shaders/toon_shading.fs");
+    Shader* const gBufferShader = new Shader("g_buffer");
+    gBufferShader->Load("shaders/g_buffer.vs", "shaders/g_buffer.fs");
 
-    Object vikingRoom(shader, model, tex, Vector4(1.f, 1.f, 1.f, 1.0f), Vector3(0.f), Vector3(-M_PI / 2, -M_PI / 2, 0), Vector3(1.f));
+    Shader* const deferredShader = new Shader("deferred");
+    deferredShader->Load("shaders/deferred.vs", "shaders/deferred.fs");
+
+    Object vikingRoom(gBufferShader, model, tex, Vector4(1.f, 1.f, 1.f, 1.0f), Vector3(0.f), Vector3(0, -M_PI / 2, -M_PI / 2), Vector3(1.f));
     vikingRoom.Name = "Viking sphere";
     scene.AddObject(vikingRoom);
 
@@ -242,6 +245,12 @@ void Application::MainLoop()
     bool isTooned = false;
     bool isGooched = false;
     int toonColorLevel = 1;
+
+    deferredShader->Use();
+    deferredShader->SetUniform("gPosition", 0);
+    deferredShader->SetUniform("gNormal", 1);
+    deferredShader->SetUniform("gAlbedoSpec", 2);
+
     while (!glfwWindowShouldClose(m_Window))
     {
         const float currentFrame = static_cast<float>(glfwGetTime());
@@ -251,20 +260,32 @@ void Application::MainLoop()
         PreLoop();
         ProcessInput();
 
+        gBuffer.Begin();
+
         time += m_DeltaTime;
         ImGui::Checkbox("Tooned", &isTooned);
         ImGui::Checkbox("Gooched", &isGooched);
-        shader->Use();
+        gBufferShader->Use();
         if (isTooned)
         {
             ImGui::SliderInt("toon color level", &toonColorLevel, 1, 100);
-            shader->SetUniform("toon_color_levels", toonColorLevel);
+            gBufferShader->SetUniform("toon_color_levels", toonColorLevel);
         }
-        shader->SetUniform("IsTooned", isTooned);
-        shader->SetUniform("IsGooched", isGooched);
+        //shader->SetUniform("IsTooned", isTooned);
+        //shader->SetUniform("IsGooched", isGooched);
         camera.Update();
 
         scene.Update();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        deferredShader->Use();
+        camera.SendToShader(*deferredShader);
+        scene.ApplyLights(*deferredShader);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        gBuffer.BindTextures();
+        deferredShader->Use();
+        gBuffer.RenderQuad();
+        gBuffer.End();
 
         EngineUi::DrawSceneGraph(scene);
 

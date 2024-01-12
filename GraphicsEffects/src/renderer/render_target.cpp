@@ -21,6 +21,9 @@ RenderTarget::RenderTarget(const std::string&& name, const bool clearOnBegin, co
 	glGenTextures(1, &m_TextureBuffer);
 	glBindTexture(GL_TEXTURE_2D, m_TextureBuffer);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 	glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, screenSize.x, screenSize.y, 0, m_Format, GL_FLOAT, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, 0);

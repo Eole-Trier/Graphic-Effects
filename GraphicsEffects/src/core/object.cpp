@@ -111,6 +111,7 @@ void Object::Render()
 	const Matrix4x4& model = Transformation.GetGlobalTransform();
 	Matrix4x4::Multiply(cam->GetProjView(), model, mvp);
 
+	glActiveTexture(GL_TEXTURE0);
 	m_Texture->Use();
 	m_Shader->Use();
 

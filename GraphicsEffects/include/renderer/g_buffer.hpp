@@ -16,10 +16,18 @@ public:
 	void Begin();
 	void End();
 
+	void OnGui();
+	void RenderQuad();
+
+	void BindTextures();
+
 private:
 	GLuint m_Fbo;
+	GLuint m_QuadVao;
+	GLuint m_QuadVbo;
 	GLuint m_DepthBuffer;
 	std::vector<RenderTarget> m_RenderTargets;
 
 	void CreateDepthBuffer();
+	
 };

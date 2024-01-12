@@ -99,8 +99,8 @@ void Scene::Update()
 
 void Scene::UpdateChildren(Object& obj)
 {
-	if (obj.HasShader())
-		ApplyLights(obj.GetShader());
+	//if (obj.HasShader())
+	//	ApplyLights(obj.GetShader());
 
 	obj.Render();
 
