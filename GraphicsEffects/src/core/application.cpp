@@ -228,8 +228,10 @@ void Application::MainLoop()
     scene.AddObject(vikingRoom);
 
     Object lightObj(nullptr, nullptr, nullptr, Vector4(0), Vector3(0.f, 2.f, 0.f), Vector3(0.f), Vector3(1.f));
+    lightObj.Name = "Light";
     lightObj.AddComponent(new PointLight(&lightObj,
-        Vector4(1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f)));
+        Vector4(1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f), 1.0f));
+    scene.AddObject(lightObj);
 
     Camera camera(M_PI / 2.f, Vector2(800, 600), 0.1f, 100.f, Vector3(0.f, 0.f, 2.f), Vector3(0.f, 0.f, 0.f));
 
@@ -281,6 +283,8 @@ void Application::MainLoop()
         deferredShader->Use();
         camera.SendToShader(*deferredShader);
         scene.ApplyLights(*deferredShader);
+        float distance = (lightObj.Transformation.Position - vikingRoom.Transformation.Position).Norm();
+        printf("DISTANCE : %f", distance);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gBuffer.BindTextures();
         deferredShader->Use();

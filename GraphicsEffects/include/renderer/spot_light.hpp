@@ -16,13 +16,15 @@ public:
 	float QuadraticAttenuation;
 
 	SpotLight(Object* const obj, const Vector3& direction, const float cutOff, const float outerCutoff,
-		const Vector4& diffuse, const Vector4& ambient, const Vector4& specular);
+		const Vector4& diffuse, const Vector4& ambient, const Vector4& specular, const float intensity);
 	SpotLight(Object* const obj, const Vector3& direction, const float cutOff, const float outerCutoff,
 		const Vector4& diffuse, const Vector4& ambient, const Vector4& specular,
-		const float constantAtt, const float linearAtt, const float quadAtt);
+		const float constantAtt, const float linearAtt, const float quadAtt, const float intensity);
 
 	~SpotLight() override;
 
 	void ForwardToShader(Shader& shader, uint32_t i) const override;
 	void OnGui() override;
+
+	void UpdateRadius() override;
 };

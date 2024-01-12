@@ -68,25 +68,28 @@ void Scene::ApplyLights(Shader& shader)
 	shader.SetUniform("nbrDirLights", static_cast<int32_t>(m_DirLights.size()));
 	for (size_t i = 0; i < m_DirLights.size(); i++)
 	{
-		const DirectionalLight* l = m_DirLights[i];
+		DirectionalLight* l = m_DirLights[i];
 
 		l->ForwardToShader(shader, static_cast<uint32_t>(i));
+		l->UpdateRadius();
 	}
 
 	shader.SetUniform("nbrPointLights", static_cast<int32_t>(m_PointLights.size()));
 	for (size_t i = 0; i < m_PointLights.size(); i++)
 	{
-		const PointLight* l = m_PointLights[i];
+		PointLight* l = m_PointLights[i];
 
 		l->ForwardToShader(shader, static_cast<uint32_t>(i));
+		l->UpdateRadius();
 	}
 
 	shader.SetUniform("nbrSpotLights", static_cast<int32_t>(m_SpotLights.size()));
 	for (size_t i = 0; i < m_SpotLights.size(); i++)
 	{
-		const SpotLight* l = m_SpotLights[i];
+		SpotLight* l = m_SpotLights[i];
 
 		l->ForwardToShader(shader, static_cast<uint32_t>(i));
+		l->UpdateRadius();
 	}
 
 	shader.Unuse();

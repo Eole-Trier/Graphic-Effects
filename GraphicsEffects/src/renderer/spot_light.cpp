@@ -10,8 +10,8 @@
 #include "ImGui/imgui.h"
 
 SpotLight::SpotLight(Object* const obj, const Vector3& direction, const float cutOff, const float outerCutoff,
-	const Vector4& diffuse, const Vector4& ambient, const Vector4& specular)
-	: Light(obj, diffuse, ambient, specular), Direction(direction), CutOff(cutOff), OuterCutOff(outerCutoff)
+	const Vector4& diffuse, const Vector4& ambient, const Vector4& specular, const float intensity)
+	: Light(obj, diffuse, ambient, specular, intensity), Direction(direction), CutOff(cutOff), OuterCutOff(outerCutoff)
 {
 	ConstantAttenuation = 1.f;
 	LinearAttenuation = 0.f;
@@ -22,8 +22,8 @@ SpotLight::SpotLight(Object* const obj, const Vector3& direction, const float cu
 
 SpotLight::SpotLight(Object* const obj, const Vector3& direction, const float cutOff, const float outerCutoff,
 	const Vector4& diffuse, const Vector4& ambient, const Vector4& specular,
-	const float constantAtt, const float linearAtt, const float quadAtt)
-	: Light(obj, diffuse, ambient, specular), Direction(direction), CutOff(cutOff), OuterCutOff(outerCutoff),
+	const float constantAtt, const float linearAtt, const float quadAtt, const float intensity)
+	: Light(obj, diffuse, ambient, specular, intensity), Direction(direction), CutOff(cutOff), OuterCutOff(outerCutoff),
 	ConstantAttenuation(constantAtt), LinearAttenuation(linearAtt),	QuadraticAttenuation(quadAtt)
 {
 	Scene::CurrentScene()->AddSpotLight(this);
@@ -65,4 +65,11 @@ void SpotLight::OnGui()
 
 	ImGui::SliderAngle("Cut-off", &CutOff, 0.f, 180.f);
 	ImGui::SliderAngle("Outer cut-off", &OuterCutOff, 0.f, 180.f);
+	ImGui::SliderFloat("Intensity", &Intensity, 0.f, 5.f);
 }
+
+void SpotLight::UpdateRadius()
+{
+	Light::UpdateRadius();
+}
+
