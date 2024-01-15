@@ -115,42 +115,41 @@ vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
 vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     // calculate distance between light source and current fragment
+    // Get light direction
+    vec3 lightDir = normalize(light.position - fragPos);
+
+    // Get diffuse intensity
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    // Reflect light direction
+    vec3 reflectDir = reflect(-lightDir, normal);
+
+    // Get specular intensity
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+
+    // Get the distance between the light and the pixel
     float distance = length(light.position - fragPos);
-    if(distance < light.radius)
-    {
-        // Get light direction
-        vec3 lightDir = normalize(light.position - fragPos);
 
-        // Get diffuse intensity
-        float diff = max(dot(normal, lightDir), 0.0);
+    float radiusSq = light.radius * light.radius;
 
-        // Reflect light direction
-        vec3 reflectDir = reflect(-lightDir, normal);
+    float linearAtt = light.radius / (light.radius + light.linear * distance);
+    float quadAtt = radiusSq / (radiusSq + light.quadratic * distance * distance);
 
-        // Get specular intensity
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    // Compute light attenuation
+    float attenuation = linearAtt * quadAtt;    
 
-        // Get the distance between the light and the pixel
-        float distance = length(light.position - fragPos);
+    // Get result lights
+    vec4 ambient = light.ambient;
+    vec4 diffuse = light.diffuse * diff;
+    vec4 specular = light.specular * spec;
 
-        // Compute light attenuation
-        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+    // Apply attenuation
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
 
-        // Get result lights
-        vec4 ambient = light.ambient;
-        vec4 diffuse = light.diffuse * diff;
-        vec4 specular = light.specular * spec;
-
-        // Apply attenuation
-        ambient *= attenuation;
-        diffuse *= attenuation;
-        specular *= attenuation;
-
-        // Combine
-        return ambient + diffuse + specular;
-    }
-
-    return vec4(0);
+    // Combine
+    return ambient + diffuse + specular;
 }
 
 vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -170,8 +169,11 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // Get the distance between the light and the pixel
     float dist = length(light.position - fragPos);
     
+    float linearAtt = light.radius / (light.radius + light.linear * distance);
+    float quadAtt = radiusSq / (radiusSq + light.quadratic * distance * distance);
+
     // Compute light attenuation
-    float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));    
+    float attenuation = linearAtt * quadAtt;        
 
     // Compute cutoff
     float theta = dot(lightDir, normalize(-light.direction)); 

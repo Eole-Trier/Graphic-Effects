@@ -283,8 +283,6 @@ void Application::MainLoop()
         deferredShader->Use();
         camera.SendToShader(*deferredShader);
         scene.ApplyLights(*deferredShader);
-        float distance = (lightObj.Transformation.Position - vikingRoom.Transformation.Position).Norm();
-        printf("DISTANCE : %f", distance);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gBuffer.BindTextures();
         deferredShader->Use();
