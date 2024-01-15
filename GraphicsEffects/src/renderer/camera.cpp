@@ -30,7 +30,10 @@ Camera::Camera(const float_t fov, const Vector2 screenSize, const float_t depthN
 void Camera::SendToShader(const Shader& shader)
 {
 	shader.Use();
-	shader.SetUniform("viewPos", Position);
+
+	if (shader.HasVariable(ShaderVariables::VIEW_POS))
+		shader.SetUniform("viewPos", Position);
+
 	shader.Unuse();
 }
 

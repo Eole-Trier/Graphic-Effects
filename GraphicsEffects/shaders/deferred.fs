@@ -168,12 +168,15 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     
     // Get the distance between the light and the pixel
     float dist = length(light.position - fragPos);
+
+    float distance = length(light.position - fragPos);
+    float radiusSq = light.radius * light.radius;
     
     float linearAtt = light.radius / (light.radius + light.linear * distance);
     float quadAtt = radiusSq / (radiusSq + light.quadratic * distance * distance);
 
     // Compute light attenuation
-    float attenuation = linearAtt * quadAtt;        
+    float attenuation = linearAtt * quadAtt;
 
     // Compute cutoff
     float theta = dot(lightDir, normalize(-light.direction)); 

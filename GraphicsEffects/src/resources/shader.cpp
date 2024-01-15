@@ -5,10 +5,27 @@
 
 #include "glad/glad.h"
 
+ShaderVariables operator|(ShaderVariables left, ShaderVariables right)
+{
+	return static_cast<ShaderVariables>(static_cast<uint32_t>(left) | static_cast<uint32_t>(right));
+}
+
+ShaderVariables operator|=(ShaderVariables left, ShaderVariables right)
+{
+	return static_cast<ShaderVariables>(static_cast<uint32_t>(left) | static_cast<uint32_t>(right));
+}
+
+bool operator&(ShaderVariables left, ShaderVariables right)
+{
+	return static_cast<uint32_t>(left) & static_cast<uint32_t>(right);
+}
+
 void Shader::Load(const std::filesystem::path& vertex, const std::filesystem::path& fragment)
 {
 	const ShaderPart vShader(m_Name + " vertex", ShaderType::VERTEX, vertex);
 	const ShaderPart fShader(m_Name + " fragment", ShaderType::FRAGMENT, fragment);
+
+	m_Variables = vShader.m_Variables | fShader.m_Variables;
 
 	m_Handle = glCreateProgram();
 	glAttachShader(m_Handle, vShader.m_Handle);
@@ -33,6 +50,11 @@ void Shader::Use() const
 void Shader::Unuse() const
 {
 	glUseProgram(0);
+}
+
+bool Shader::HasVariable(const ShaderVariables variable) const
+{
+	return m_Variables & variable;
 }
 
 void Shader::SetUniform(const std::string& name, const bool value) const

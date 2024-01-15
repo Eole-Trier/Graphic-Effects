@@ -27,6 +27,31 @@ uint32_t ShaderPart::GetShaderTypeEnum(const ShaderType type)
 	}
 }
 
+void ShaderPart::SetVertexVariables(const std::string& source)
+{
+
+}
+
+void ShaderPart::SetFragmentVariables(const std::string& source)
+{
+	if (source.find("viewPos") != std::string::npos)
+		m_Variables |= ShaderVariables::VIEW_POS;
+}
+
+void ShaderPart::SetVariables(const std::string& source)
+{
+	switch (m_Type)
+	{
+		case ShaderType::VERTEX:
+			SetVertexVariables(source);
+			break;
+
+		case ShaderType::FRAGMENT:
+			SetFragmentVariables(source);
+			break;
+	}
+}
+
 ShaderPart::ShaderPart(const std::string& name, const ShaderType type, const std::filesystem::path& path)
 	: Resource(name), m_Type(type)
 {
@@ -38,6 +63,7 @@ ShaderPart::ShaderPart(const std::string& name, const ShaderType type, const std
 	const char* const sourceRaw = source.c_str();
 	
 	m_Handle = glCreateShader(GetShaderTypeEnum(m_Type));
+	SetVariables(source);
 
 	glShaderSource(m_Handle, 1, &sourceRaw, nullptr);
 	glCompileShader(m_Handle);

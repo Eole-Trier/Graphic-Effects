@@ -20,7 +20,14 @@ private:
 	ShaderType m_Type;
 	uint32_t m_Handle;
 
+	ShaderVariables m_Variables;
+
 	static uint32_t GetShaderTypeEnum(const ShaderType type);
+
+	void SetVertexVariables(const std::string& source);
+	void SetFragmentVariables(const std::string& source);
+
+	void SetVariables(const std::string& source);
 
 public:
 	ShaderPart(const std::string& name) : Resource(name) {}

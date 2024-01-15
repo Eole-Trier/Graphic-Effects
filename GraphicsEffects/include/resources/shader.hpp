@@ -10,10 +10,22 @@
 #include "core/maths/matrix3x3.h"
 #include "core/maths/matrix4x4.h"
 
+enum class ShaderVariables : uint32_t
+{
+	VIEW_POS = 1 << 0,
+};
+
+ShaderVariables operator|(ShaderVariables left, ShaderVariables right);
+
+ShaderVariables operator|=(ShaderVariables left, ShaderVariables right);
+
+bool operator&(ShaderVariables left, ShaderVariables right);
+
 class Shader : public Resource
 {
 private:
 	uint32_t m_Handle;
+	ShaderVariables m_Variables;
 
 	inline int32_t GetUniform(const std::string& name) const;
 
@@ -25,6 +37,8 @@ public:
 
 	void Use() const;
 	void Unuse() const;
+
+	bool HasVariable(const ShaderVariables variable) const;
 
 	void SetUniform(const std::string& name, const bool value) const;
 	void SetUniform(const std::string& name, const int32_t value) const;
