@@ -3,6 +3,13 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+enum ShaderStatus
+{
+	DEFFERED,
+	GOOCHED,
+	TOONED
+};
+
 class Application
 {
 private:
@@ -12,6 +19,7 @@ private:
 
 	static bool m_LookingWithCamera;
 
+	static ShaderStatus m_shaderStatus;
 	static GLFWwindow* m_Window;
 	static float m_DeltaTime;
 

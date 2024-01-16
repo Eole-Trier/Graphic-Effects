@@ -1,7 +1,5 @@
 #version 330 core
 
-
-
 out vec4 outColor;
   
 in vec2 texCoords;
@@ -49,10 +47,6 @@ struct SpotLight
     float quadratic; 
 };
 
-uniform bool IsTooned;
-uniform bool IsGooched;
-uniform int toon_color_levels;
-float toon_scale_factor = 1.0f / toon_color_levels;
 
 uniform vec3 viewPos;
 
@@ -96,8 +90,7 @@ vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
 
-    if (IsTooned)
-        diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
+   
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -111,9 +104,7 @@ vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec4 specular = light.specular * spec;
 
     // Combine
-    if (IsGooched)
-        return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
-    return ambient + diffuse + specular;
+    return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
 }
 
 vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -123,9 +114,6 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
 
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
-
-    if (IsTooned)
-        diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -150,9 +138,7 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
     specular *= attenuation;
 
     // Combine
-    if (IsGooched)
-        return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
-    return ambient + diffuse + specular;
+    return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
 }
 
 vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -162,9 +148,6 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
-
-    if (IsTooned)
-        diff = ceil(diff * toon_color_levels) * toon_scale_factor; // toonification
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -194,9 +177,7 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation * intensity;
 
     // Combine
-    if (IsGooched)
-        return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
-    return ambient + diffuse + specular;
+    return GoochShading(ambient + diffuse + specular, lightDir, normal, viewDir);
 }
 
 vec4 GoochShading(vec4 color, vec3 dir, vec3 normal, vec3 viewDir)

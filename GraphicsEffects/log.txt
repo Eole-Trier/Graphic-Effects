@@ -1,0 +1,17 @@
+[16/01/2024 15-55-31] Error : shader_part.cpp (78) in ShaderPart : Failed to compile shader : tooned fragment : 0(102) : error C1503: undefined variable "toon_color_levels"
+0(102) : error C1503: undefined variable "toon_scale_factor"
+0(129) : error C1503: undefined variable "toon_color_levels"
+0(129) : error C1503: undefined variable "toon_scale_factor"
+0(170) : error C1503: undefined variable "toon_color_levels"
+0(170) : error C1503: undefined variable "toon_scale_factor"
+
+[16/01/2024 15-55-31] Error : shader.cpp (41) in Load : Failed to link shader : tooned : Fragment info
+-------------
+0(102) : error C1503: undefined variable "toon_color_levels"
+0(102) : error C1503: undefined variable "toon_scale_factor"
+0(129) : error C1503: undefined variable "toon_color_levels"
+0(129) : error C1503: undefined variable "toon_scale_factor"
+0(170) : error C1503: undefined variable "toon_color_levels"
+0(170) : error C1503: undefined variable "toon_scale_factor"
+(0) : error C2003: incompatible options for link
+

@@ -59,41 +59,49 @@ bool Shader::HasVariable(const ShaderVariables variable) const
 
 void Shader::SetUniform(const std::string& name, const bool value) const
 {
+	glUseProgram(m_Handle);
 	glUniform1i(GetUniform(name), value);
 }
 
 void Shader::SetUniform(const std::string& name, const int32_t value) const
 {
+	glUseProgram(m_Handle);
 	glUniform1i(GetUniform(name), value);
 }
 
 void Shader::SetUniform(const std::string& name, const float_t value) const
 {
+	glUseProgram(m_Handle);
 	glUniform1f(GetUniform(name), value);
 }
 
 void Shader::SetUniform(const std::string& name, const Vector2 value) const
 {
+	glUseProgram(m_Handle);
 	glUniform2fv(GetUniform(name), 1, &value.x);
 }
 
 void Shader::SetUniform(const std::string& name, const Vector3& value) const
 {
+	glUseProgram(m_Handle);
 	glUniform3fv(GetUniform(name), 1, &value.x);
 }
 
 void Shader::SetUniform(const std::string& name, const Vector4& value) const
 {
+	glUseProgram(m_Handle);
 	glUniform4fv(GetUniform(name), 1, &value.x);
 }
 
 void Shader::SetUniform(const std::string& name, const Matrix2x2& value) const
 {
+	glUseProgram(m_Handle);
 	glUniformMatrix2fv(GetUniform(name), 1, GL_TRUE, &value.Row0.x);
 }
 
 void Shader::SetUniform(const std::string& name, const Matrix3x3& value) const
 {
+	glUseProgram(m_Handle);
 	glUniformMatrix3fv(GetUniform(name), 1, GL_TRUE, &value.Row0.x);
 }
 
