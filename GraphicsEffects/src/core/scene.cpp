@@ -71,7 +71,6 @@ void Scene::ApplyLights(Shader& shader)
 		DirectionalLight* l = m_DirLights[i];
 
 		l->ForwardToShader(shader, static_cast<uint32_t>(i));
-		l->UpdateRadius();
 	}
 
 	shader.SetUniform("nbrPointLights", static_cast<int32_t>(m_PointLights.size()));
@@ -80,7 +79,6 @@ void Scene::ApplyLights(Shader& shader)
 		PointLight* l = m_PointLights[i];
 
 		l->ForwardToShader(shader, static_cast<uint32_t>(i));
-		l->UpdateRadius();
 	}
 
 	shader.SetUniform("nbrSpotLights", static_cast<int32_t>(m_SpotLights.size()));
@@ -89,7 +87,6 @@ void Scene::ApplyLights(Shader& shader)
 		SpotLight* l = m_SpotLights[i];
 
 		l->ForwardToShader(shader, static_cast<uint32_t>(i));
-		l->UpdateRadius();
 	}
 
 	shader.Unuse();

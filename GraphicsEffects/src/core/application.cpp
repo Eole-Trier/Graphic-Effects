@@ -283,6 +283,7 @@ void Application::MainLoop()
         deferredShader->Use();
         camera.SendToShader(*deferredShader);
         scene.ApplyLights(*deferredShader);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gBuffer.BindTextures();
         deferredShader->Use();

@@ -18,6 +18,4 @@ public:
 	void ForwardToShader(Shader& shader, uint32_t i) const override;
 
 	void OnGui() override;
-
-	void UpdateRadius() override;
 };

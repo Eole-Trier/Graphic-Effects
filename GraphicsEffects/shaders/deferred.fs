@@ -63,13 +63,15 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
 vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
-{             
+{
     // retrieve data from gbuffer
     vec3 fragPos = texture(gPosition, TexCoords).rgb;
     vec3 normal = texture(gNormal, TexCoords).rgb;
-    vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
-    float Specular = texture(gAlbedoSpec, TexCoords).a;
-    
+    vec3 diffuse = texture(gAlbedoSpec, TexCoords).rgb;
+
+    if (normal == vec3(0))
+        discard;
+
     // Get view direction
     vec3 viewDir = normalize(viewPos - fragPos);
 
@@ -84,8 +86,8 @@ void main()
     for (int i = 0; i < nbrSpotLights; i++)
         light += ProcessSpotLight(spotLights[i], normal, fragPos, viewDir);
 
-    // FragColor = vec4(Diffuse * light.rgb, 1.0);
-    FragColor = vec4(light.rgb * Diffuse, 1.0);
+    // FragColor = vec4(diffuse * light.rgb, 1.0);
+    FragColor = vec4(light.rgb * diffuse, 1.0);
 }
 
 vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
