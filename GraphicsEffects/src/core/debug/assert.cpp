@@ -21,7 +21,7 @@ void Assert::IsTrue(const bool condition, const char* const message,
 		int 3
 	};
 	*/
-	__debugbreak();
+ 	__debugbreak();
 #endif
 
 }

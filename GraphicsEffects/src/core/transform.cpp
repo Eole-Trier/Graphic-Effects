@@ -8,15 +8,15 @@ Transform::Transform(Object& owner)
 	Rotation = Vector3(0.f);
 	Scaling = Vector3(1.f);
 
-	UpdateTransformation();
 	m_Parent = nullptr;
+	UpdateTransformation();
 }
 
 Transform::Transform(Object& owner, const Vector3& position, const Vector3& rotation, const Vector3& scaling)
 	: m_Owner(owner), Position(position), Rotation(rotation), Scaling(scaling)
 {
-	UpdateTransformation();
 	m_Parent = nullptr;
+	UpdateTransformation();
 }
 
 Transform::Transform(Object& owner, const Vector3& position, const Vector3& rotation, const Vector3& scaling, Transform* const parent)

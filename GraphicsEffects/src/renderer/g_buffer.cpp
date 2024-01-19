@@ -109,6 +109,11 @@ void GBuffer::BindTextures()
 	}
 }
 
+GLuint GBuffer::GetFbo() const
+{
+	return m_Fbo;
+}
+
 void GBuffer::CreateDepthBuffer()
 {
 	const Vector2 screenSize = Camera::Instance->ScreenSize;

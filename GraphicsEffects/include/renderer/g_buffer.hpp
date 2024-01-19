@@ -21,6 +21,8 @@ public:
 
 	void BindTextures();
 
+	GLuint GetFbo() const;
+
 private:
 	GLuint m_Fbo;
 	GLuint m_QuadVao;

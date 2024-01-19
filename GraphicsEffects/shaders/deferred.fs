@@ -55,7 +55,7 @@ uniform int nbrPointLights;
 uniform int nbrSpotLights;
 
 uniform DirLight dirLights[3];
-uniform PointLight pointLights[10];
+uniform PointLight pointLights[100];
 uniform SpotLight spotLights[10];
 
 vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir);
@@ -138,7 +138,9 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
     float quadAtt = radiusSq / (radiusSq + light.quadratic * distance * distance);
 
     // Compute light attenuation
-    float attenuation = linearAtt * quadAtt;    
+    float attenuation = linearAtt * quadAtt;
+
+    attenuation = 1.0 / (1 + light.linear * distance + light.quadratic * distance * distance);
 
     // Get result lights
     vec4 ambient = light.ambient;
@@ -179,6 +181,8 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     // Compute light attenuation
     float attenuation = linearAtt * quadAtt;
+
+    attenuation = 1.0 / (1 + light.linear * distance + light.quadratic * distance * distance);
 
     // Compute cutoff
     float theta = dot(lightDir, normalize(-light.direction)); 

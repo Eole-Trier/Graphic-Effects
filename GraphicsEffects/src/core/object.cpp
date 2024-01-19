@@ -14,12 +14,6 @@ Object::Object(Shader* const shader, Model* const model, Texture* const texture,
 	else
 		m_Hidden = false;
 
-	if (m_OutlineShader == nullptr)
-	{
-		m_OutlineShader = new Shader("outlineShader");
-		m_OutlineShader->Load("shaders/outline.vs", "shaders/outline.fs");
-	}
-
 	m_Objects.push_back(this);
 	OnCreation();
 }
@@ -28,6 +22,7 @@ Object::Object(Shader* const shader, Model* const model, Texture* const texture,
 	const Vector3& position, const Vector3& rotation, const Vector3& scaling)
 	: m_Shader(shader), m_Model(model), m_Texture(texture), m_OutlineColor(outlineColor), Transformation(*this, position, rotation, scaling)
 {
+	m_Components.clear();
 	if (shader == nullptr || model == nullptr || texture == nullptr)
 		m_Hidden = true;
 	else

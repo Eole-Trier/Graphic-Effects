@@ -213,12 +213,18 @@ void Application::Init()
 
 void Application::MainLoop()
 {
+    constexpr size_t nbrBalls = 9;
+    constexpr size_t nbrLights = 100;
+
     Scene scene("Test scene");
-    Texture* const tex = new Texture("assets/textures/viking_room.jpg");
+    Texture* const tex = new Texture("assets/textures/all_bald.png");
     tex->Load();
 
-    Model* const model = new Model("assets/models/viking_room.obj");
-    model->Load();
+    Model* const sphere = new Model("assets/models/sphere.obj");
+    sphere->Load();
+
+    Model* const cube = new Model("assets/models/cube.obj");
+    cube->Load();
 
     Shader* const gBufferShader = new Shader("g_buffer");
     gBufferShader->Load("shaders/g_buffer.vs", "shaders/g_buffer.fs");
@@ -232,17 +238,44 @@ void Application::MainLoop()
     Shader* const goochShader = new Shader("gooched");
     goochShader->Load("shaders/deferred.vs", "shaders/gooch.fs");
 
-    Object vikingRoom(gBufferShader, model, tex, Vector4(1.f, 1.f, 1.f, 1.0f), Vector3(0.f), Vector3(0, -M_PI / 2, -M_PI / 2), Vector3(1.f));
-    vikingRoom.Name = "Viking room";
-    scene.AddObject(vikingRoom);
+    Shader* const lightShader = new Shader("lighted");
+    lightShader->Load("shaders/light.vs", "shaders/light.fs");
 
-    Object lightObj(nullptr, nullptr, nullptr, Vector4(0), Vector3(0.f, 2.f, 0.f), Vector3(0.f), Vector3(1.f));
-    lightObj.Name = "Light";
-    lightObj.AddComponent(new PointLight(&lightObj,
-        Vector4(1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f), Vector4(0.5f, 0.5f, 0.5f, 1.0f), 1.0f));
-    scene.AddObject(lightObj);
+    std::vector<Object*> balls;
+    std::vector<Object*> lights;
+    std::vector<PointLight*> pointLights;
+    
+    srand(time(NULL));
+    for (size_t i = 0; i < nbrBalls; i++)
+    {
+        float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
+        float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
 
-    Camera camera(M_PI / 2.f, Vector2(800, 600), 0.1f, 100.f, Vector3(0.f, 0.f, 2.f), Vector3(0.f, 0.f, 0.f));
+        float scale = static_cast<float>(((rand() % 100) / 200.0f) + 0.1);
+        balls.push_back(new Object(gBufferShader, sphere, tex, Vector4(1.f, 1.f, 1.f, 1.0f), Vector3(xPos, yPos, zPos), Vector3(0.f), Vector3(scale)));
+        balls[i]->Name = std::string("Ball ") + std::to_string(i);
+        scene.AddObject(*balls[i]);
+    }
+
+    for (size_t i = 0; i < nbrLights; i++)
+    {
+        float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+        float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
+        float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+        // also calculate random color
+        float rColor = static_cast<float>(((rand() % 100) / 100.0f)); // between 0.5 and 1.)
+        float gColor = static_cast<float>(((rand() % 100) / 100.0f)); // between 0.5 and 1.)
+        float bColor = static_cast<float>(((rand() % 100) / 100.0f)); // between 0.5 and 1.)
+        Vector4 color = Vector4(rColor, gColor, bColor, 1.f);
+
+        lights.push_back(new Object(lightShader, cube, tex, Vector4(0), Vector3(xPos, yPos, zPos), Vector3(0.f), Vector3(0.1f)));
+        lights[i]->Name = std::string("Light ") + std::to_string(i);
+        pointLights.push_back(new PointLight(lights[i], color, color, color, 1.0f, 1.f, 2.f, 1.f));
+        lights[i]->AddComponent(pointLights[i]);
+    }
+
+    Camera camera(M_PI / 2.f, Vector2(800, 600), 0.1f, 100.f, Vector3(0.f, 0.f, 5.f), Vector3(0.f, 0.f, 0.f));
 
     GBuffer gBuffer;
     gBuffer.AddTarget(RenderTarget("Position pass", false, Vector4(0.f), GL_RGBA16F, GL_RGBA, GL_FLOAT));
@@ -254,8 +287,6 @@ void Application::MainLoop()
     float time = 0.f;
 
     int toonColorLevel = 1;
-
-    
 
     while (!glfwWindowShouldClose(m_Window))
     {
@@ -309,17 +340,36 @@ void Application::MainLoop()
         gBuffer.RenderQuad();
         gBuffer.End();
 
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer.GetFbo());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+        glBlitFramebuffer(
+            0, 0, camera.ScreenSize.x, camera.ScreenSize.y, 0, 0, camera.ScreenSize.x, camera.ScreenSize.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        );
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        for (size_t i = 0; i < nbrLights; i++)
+        {
+            lights[i]->GetShader().SetUniform("lightColor", pointLights[i]->Diffuse);
+            lights[i]->Render();
+        }
+
         EngineUi::DrawSceneGraph(scene);
 
         PostLoop();
     }
 
     delete tex;
-    delete model;
+    delete sphere;
     delete gBufferShader;
     delete deferredShader;
     delete toonShader;
     delete goochShader;
+
+    for (size_t i = 0; i < nbrBalls; i++)
+        delete balls[i];
+
+    for (size_t i = 0; i < nbrLights; i++)
+        delete lights[i];
 }
 
 void Application::Shutdown()

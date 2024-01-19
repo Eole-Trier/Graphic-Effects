@@ -55,7 +55,7 @@ uniform int nbrPointLights;
 uniform int nbrSpotLights;
 
 uniform DirLight dirLights[3];
-uniform PointLight pointLights[10];
+uniform PointLight pointLights[100];
 uniform SpotLight spotLights[10];
 
 vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir);
