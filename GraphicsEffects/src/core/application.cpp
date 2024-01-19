@@ -227,13 +227,13 @@ void Application::MainLoop()
     deferredShader->Load("shaders/deferred.vs", "shaders/deferred.fs");
 
     Shader* const toonShader = new Shader("tooned");
-    toonShader->Load("shaders/toon.vs", "shaders/toon.fs");
+    toonShader->Load("shaders/deferred.vs", "shaders/toon.fs");
 
     Shader* const goochShader = new Shader("gooched");
-    goochShader->Load("shaders/gooch.vs", "shaders/gooch.fs");
+    goochShader->Load("shaders/deferred.vs", "shaders/gooch.fs");
 
     Object vikingRoom(gBufferShader, model, tex, Vector4(1.f, 1.f, 1.f, 1.0f), Vector3(0.f), Vector3(0, -M_PI / 2, -M_PI / 2), Vector3(1.f));
-    vikingRoom.Name = "Viking sphere";
+    vikingRoom.Name = "Viking room";
     scene.AddObject(vikingRoom);
 
     Object lightObj(nullptr, nullptr, nullptr, Vector4(0), Vector3(0.f, 2.f, 0.f), Vector3(0.f), Vector3(1.f));
@@ -270,7 +270,7 @@ void Application::MainLoop()
 
         time += m_DeltaTime;
 
-        const char* items[] = {"DEFFERED", "GOOCHED", "TOONED" };
+        const char* items[] = { "DEFFERED", "GOOCHED", "TOONED" };
 
         ImGui::Combo("Render status", (int*)&m_shaderStatus, items, IM_ARRAYSIZE(items));
 

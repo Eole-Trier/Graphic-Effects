@@ -40,6 +40,7 @@ void ShaderPart::SetFragmentVariables(const std::string& source)
 
 void ShaderPart::SetVariables(const std::string& source)
 {
+	m_Variables = ShaderVariables::NONE;
 	switch (m_Type)
 	{
 		case ShaderType::VERTEX:

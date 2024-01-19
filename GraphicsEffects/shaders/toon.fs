@@ -1,7 +1,7 @@
 #version 460 core
 out vec4 FragColor;
 
-in vec2 TexCoords;
+in vec2 texCoords;
 
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
@@ -48,6 +48,9 @@ struct SpotLight
     float radius;
 };
 
+uniform int toon_color_levels;
+float toon_scale_factor = 1.0f / toon_color_levels;
+
 uniform vec3 viewPos;
 
 uniform int nbrDirLights;
@@ -65,9 +68,9 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 void main()
 {
     // retrieve data from gbuffer
-    vec3 fragPos = texture(gPosition, TexCoords).rgb;
-    vec3 normal = texture(gNormal, TexCoords).rgb;
-    vec3 diffuse = texture(gAlbedoSpec, TexCoords).rgb;
+    vec3 fragPos = texture(gPosition, texCoords).rgb;
+    vec3 normal = texture(gNormal, texCoords).rgb;
+    vec3 diffuse = texture(gAlbedoSpec, texCoords).rgb;
 
     if (normal == vec3(0))
         discard;
@@ -86,8 +89,8 @@ void main()
     for (int i = 0; i < nbrSpotLights; i++)
         light += ProcessSpotLight(spotLights[i], normal, fragPos, viewDir);
 
-    // FragColor = vec4(diffuse * light.rgb, 1.0);
-    FragColor = vec4(light.rgb * diffuse, 1.0);
+    FragColor = vec4(diffuse * light.rgb, 1.0);
+    // FragColor = vec4(light.rgb * diffuse, 1.0);
 }
 
 vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)

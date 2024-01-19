@@ -1,12 +1,11 @@
-#version 330 core
+#version 460 core
+out vec4 FragColor;
 
-out vec4 outColor;
-  
 in vec2 texCoords;
-in vec3 normal;
-in vec3 fragPos;
 
-uniform sampler2D ourTexture;
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gAlbedoSpec;
 
 struct PointLight
 {
@@ -19,6 +18,7 @@ struct PointLight
     float constant;
     float linear;
     float quadratic;
+    float radius;
 };
 
 struct DirLight
@@ -45,8 +45,8 @@ struct SpotLight
     float constant;
     float linear;
     float quadratic; 
+    float radius;
 };
-
 
 uniform vec3 viewPos;
 
@@ -65,6 +65,14 @@ vec4 GoochShading(vec4 color, vec3 dir, vec3 normal, vec3 viewDir);
 
 void main()
 {
+    // retrieve data from gbuffer
+    vec3 fragPos = texture(gPosition, texCoords).rgb;
+    vec3 normal = texture(gNormal, texCoords).rgb;
+    vec3 diffuse = texture(gAlbedoSpec, texCoords).rgb;
+
+    if (normal == vec3(0))
+        discard;
+
     // Get view direction
     vec3 viewDir = normalize(viewPos - fragPos);
 
@@ -79,18 +87,18 @@ void main()
     for (int i = 0; i < nbrSpotLights; i++)
         light += ProcessSpotLight(spotLights[i], normal, fragPos, viewDir);
 
-    outColor = light * texture(ourTexture, texCoords);
+    // FragColor = vec4(diffuse * light.rgb, 1.0);
+    FragColor = vec4(light.rgb * diffuse, 1.0);
 }
 
 vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
+    
     // Get light direction
     vec3 lightDir = normalize(-light.direction);
 
     // Get diffuse intensity
     float diff = max(dot(normal, lightDir), 0.0);
-
-   
 
     // Reflect light direction
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -109,6 +117,7 @@ vec4 ProcessDirLight(DirLight light, vec3 normal, vec3 viewDir)
 
 vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
+    // calculate distance between light source and current fragment
     // Get light direction
     vec3 lightDir = normalize(light.position - fragPos);
 
@@ -124,8 +133,13 @@ vec4 ProcessPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
     // Get the distance between the light and the pixel
     float distance = length(light.position - fragPos);
 
+    float radiusSq = light.radius * light.radius;
+
+    float linearAtt = light.radius / (light.radius + light.linear * distance);
+    float quadAtt = radiusSq / (radiusSq + light.quadratic * distance * distance);
+
     // Compute light attenuation
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+    float attenuation = linearAtt * quadAtt;    
 
     // Get result lights
     vec4 ambient = light.ambient;
@@ -157,9 +171,15 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     
     // Get the distance between the light and the pixel
     float dist = length(light.position - fragPos);
+
+    float distance = length(light.position - fragPos);
+    float radiusSq = light.radius * light.radius;
     
+    float linearAtt = light.radius / (light.radius + light.linear * distance);
+    float quadAtt = radiusSq / (radiusSq + light.quadratic * distance * distance);
+
     // Compute light attenuation
-    float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));    
+    float attenuation = linearAtt * quadAtt;
 
     // Compute cutoff
     float theta = dot(lightDir, normalize(-light.direction)); 
@@ -204,3 +224,4 @@ vec4 GoochShading(vec4 color, vec3 dir, vec3 normal, vec3 viewDir)
 
     return vec4(newColor+spec.xyz, color.a);
 }
+

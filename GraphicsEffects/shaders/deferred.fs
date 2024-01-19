@@ -1,7 +1,7 @@
 #version 460 core
 out vec4 FragColor;
 
-in vec2 TexCoords;
+in vec2 texCoords;
 
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
@@ -65,9 +65,9 @@ vec4 ProcessSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 void main()
 {
     // retrieve data from gbuffer
-    vec3 fragPos = texture(gPosition, TexCoords).rgb;
-    vec3 normal = texture(gNormal, TexCoords).rgb;
-    vec3 diffuse = texture(gAlbedoSpec, TexCoords).rgb;
+    vec3 fragPos = texture(gPosition, texCoords).rgb;
+    vec3 normal = texture(gNormal, texCoords).rgb;
+    vec3 diffuse = texture(gAlbedoSpec, texCoords).rgb;
 
     if (normal == vec3(0))
         discard;

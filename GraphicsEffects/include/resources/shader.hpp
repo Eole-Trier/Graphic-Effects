@@ -12,6 +12,7 @@
 
 enum class ShaderVariables : uint32_t
 {
+	NONE = 0 << 0,
 	VIEW_POS = 1 << 0,
 };
 
